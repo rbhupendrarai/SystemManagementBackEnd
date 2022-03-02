@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SystemManagement.Data.Helper;
 
 namespace SystemManagement.Api.Controllers
 {
+  
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles =UserRoles.Admin)]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -22,7 +26,7 @@ namespace SystemManagement.Api.Controllers
         {
             _logger = logger;
         }
-
+     
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {

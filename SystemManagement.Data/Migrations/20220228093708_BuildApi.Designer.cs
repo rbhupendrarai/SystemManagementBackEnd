@@ -9,7 +9,7 @@ using SystemManagement.Data.Data;
 
 namespace SystemManagement.Data.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(SystemManagementDbContext))]
     [Migration("20220228093708_BuildApi")]
     partial class BuildApi
     {

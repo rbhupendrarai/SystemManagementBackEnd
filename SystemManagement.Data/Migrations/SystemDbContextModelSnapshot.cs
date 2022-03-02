@@ -8,7 +8,7 @@ using SystemManagement.Data.Data;
 
 namespace SystemManagement.Data.Migrations
 {
-    [DbContext(typeof(SystemDbContext))]
+    [DbContext(typeof(SystemManagementDbContext))]
     partial class SystemDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
