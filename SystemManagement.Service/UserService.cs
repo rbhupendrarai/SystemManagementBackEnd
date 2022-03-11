@@ -28,7 +28,7 @@ namespace SystemManagement.Service
 
 
 
-        public async Task<string> Register(RegisterViewModel registerViewModel)
+        public async Task<string> Register([FromQuery]RegisterViewModel registerViewModel)
         {
             string Message = string.Empty;
             var user = new IdentityUser
@@ -104,7 +104,7 @@ namespace SystemManagement.Service
 
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
                 var token = new JwtSecurityToken(
-                    issuer: _configuration["JWT:ValideIssuer"],
+                    issuer: _configuration["JWT:ValidIssuer"],
                     audience: _configuration["JWT:ValidAudience"],
                     expires: DateTime.Now.AddHours(3),
                     claims: authClaims,

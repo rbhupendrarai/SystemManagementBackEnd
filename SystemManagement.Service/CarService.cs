@@ -16,9 +16,9 @@ namespace SystemManagement.Service
             _context = systemManagementSystemDbContext;
         }
         
-        public Car GetCarByID(Guid id)
+        public List<Car> GetCarByID()
         {
-            return _context.Cars.Find(id);
+            return _context.Cars.ToList();
         }
       
     }

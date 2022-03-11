@@ -10,7 +10,10 @@ using SystemManagement.Service;
 
 namespace SystemManagement.Api.Controllers
 {
-    [Authorize]
+    
+    [ApiController]
+    [Route("api/[controller]")]
+
     public class CarController : Controller
     {
         private readonly CarService _carService;
@@ -19,10 +22,11 @@ namespace SystemManagement.Api.Controllers
             _carService = carService;
         }
       
-        [HttpGet("{id}")]  
-        public ActionResult<Car> GetCar(Guid id)
+        [HttpGet]   
+        public JsonResult GetCar()
         {
-            return _carService.GetCarByID(id);         
+            var result = _carService.GetCarByID();
+            return new JsonResult(result);
 
         }
     }

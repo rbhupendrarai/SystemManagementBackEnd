@@ -12,7 +12,7 @@ namespace SystemManagement.Api.Controllers
   
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles =UserRoles.Admin)]
+    [Authorize(Roles =UserRoles.User)]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
