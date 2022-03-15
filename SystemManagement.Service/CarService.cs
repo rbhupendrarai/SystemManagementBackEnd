@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,30 @@ namespace SystemManagement.Service
         {
             return _context.Cars.ToList();
         }
-      
+
+        public async Task<bool> AddCar([FromQuery]Car car)
+        {
+            try
+            {
+               
+                  
+                    car.CreatedBy = "Admin";
+                    car.CreatedDate = DateTime.Now;
+                    car.ModifiedBy = "Admin";
+                    car.ModifiedDate = DateTime.Now;
+                    await _context.Cars.AddAsync(car);
+                    await _context.SaveChangesAsync();
+                
+                   
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
     }
 }

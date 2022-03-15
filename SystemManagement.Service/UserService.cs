@@ -28,7 +28,7 @@ namespace SystemManagement.Service
 
 
 
-        public async Task<string> Register([FromQuery]RegisterViewModel registerViewModel)
+        public async Task<string> Register(RegisterViewModel registerViewModel)
         {
             string Message = string.Empty;
             var user = new IdentityUser

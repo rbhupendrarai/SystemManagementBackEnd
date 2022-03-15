@@ -10,7 +10,7 @@ using SystemManagement.Service;
 
 namespace SystemManagement.Api.Controllers
 {
-    
+
     [ApiController]
     [Route("api/[controller]")]
 
@@ -21,12 +21,20 @@ namespace SystemManagement.Api.Controllers
         {
             _carService = carService;
         }
-      
-        [HttpGet]   
+
+        [HttpGet]
         public JsonResult GetCar()
         {
             var result = _carService.GetCarByID();
             return new JsonResult(result);
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddCar([FromQuery] Car car)
+        {
+            var result= await _carService.AddCar(car);
+
+            return Ok(result);
 
         }
     }

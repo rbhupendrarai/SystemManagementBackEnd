@@ -45,8 +45,8 @@ namespace SystemManagement.Api.Controllers
             return Ok(new { token =result});
         }
         [HttpPost]
-        [Route("register")]
-        public async Task<IActionResult> Register([FromQuery] RegisterViewModel registerViewModel)
+        [Route("Register")]
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             var result = await _userService.Register(registerViewModel);
             if (result == "UserNameExist")
