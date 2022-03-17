@@ -25,10 +25,18 @@ namespace SystemManagement.Api.Controllers
         public UserController(UserService userService)
         {
             _userService = userService;         
-        }    
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserDetail()
+        {
+            var result = await _userService.GetUsers();
+            return Ok(result);
+
+        }
         [HttpPost]
         [Route("Login")]
-        public async Task<IActionResult> Login([FromQuery]LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             var result = await _userService.Login(loginViewModel);
 

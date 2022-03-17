@@ -6,9 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using SystemManagement.Data.Data;
 using SystemManagement.Data.Helper;
 using SystemManagement.Data.ViewModel;
 
@@ -19,14 +21,33 @@ namespace SystemManagement.Service
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
-        public UserService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        private readonly SystemManagementDbContext _context;
+        public UserService(SystemManagementDbContext context,UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _context = context;
         }
 
+        public async Task<IQueryable> GetUsers()
+        {
 
+            return from user in _context.Users
+                   join userRole in _context.UserRoles
+                   on user.Id equals userRole.UserId
+                   join role in _context.Roles
+                   on userRole.RoleId equals role.Id
+                   select new
+                   {
+                       Id = user.Id,
+                       LockDate = user.LockoutEnd,
+                       UserName = user.UserName,
+                       Email = user.Email,
+                       Role = role.Name
+
+                   };
+        }
 
         public async Task<string> Register(RegisterViewModel registerViewModel)
         {
@@ -79,7 +100,7 @@ namespace SystemManagement.Service
 
 
 
-        public async Task<string> Login([FromQuery]LoginViewModel loginViewModel)
+        public async Task<string> Login(LoginViewModel loginViewModel)
         {
             var Message = string.Empty;
             var user = await _userManager.FindByNameAsync(loginViewModel.UserName);
