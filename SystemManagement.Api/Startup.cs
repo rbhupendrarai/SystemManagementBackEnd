@@ -1,5 +1,3 @@
-
-using CarManagementSystem.Service.Helper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,11 +37,10 @@ namespace SystemManagement.Api
             {
                 c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
-            services.AddHttpContextAccessor();
+
             services.AddControllers(); 
             services.AddTransient<UserService>();
             services.AddTransient<CarService>();
-            services.AddScoped<IUserService, loggedUserService>();
             services.AddDbContext<SystemManagementDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("connection")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<SystemManagementDbContext>()
                     .AddDefaultTokenProviders();  //Register Identity services
