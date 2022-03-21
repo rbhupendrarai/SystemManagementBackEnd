@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using CarManagementSystem.Data.ViewModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,15 +23,17 @@ namespace SystemManagement.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
+
         public UserController(UserService userService)
         {
-            _userService = userService;         
+            _userService = userService;
+  
         }
-
-        [HttpGet]
+     
+       [HttpGet]
         public async Task<IActionResult> GetUserDetail()
         {
-            var result = await _userService.GetUsers();
+            var result = await _userService.getUsers();
             return Ok(result);
 
         }
@@ -39,8 +42,8 @@ namespace SystemManagement.Api.Controllers
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             var result = await _userService.Login(loginViewModel);
-
-            var Message = string.Empty;        
+    
+            var Message = string.Empty;
 
             if (result == "Unauthorized")
             {
@@ -50,7 +53,7 @@ namespace SystemManagement.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "UserName Or Password Not Match!" });
             }
-            return Ok(new { token =result});
+            return Ok(new { token=result });
         }
         [HttpPost]
         [Route("Register")]
@@ -74,6 +77,10 @@ namespace SystemManagement.Api.Controllers
             }
             return Ok(new Response { Status = "Success", Message = "created successfully!" });
         }
-       
+
+
+
+
+
     }
 }

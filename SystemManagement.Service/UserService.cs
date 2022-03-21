@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CarManagementSystem.Data.ViewModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -22,15 +23,17 @@ namespace SystemManagement.Service
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly SystemManagementDbContext _context;
-        public UserService(SystemManagementDbContext context,UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContext;
+        public UserService(IHttpContextAccessor httpContextAccessor, SystemManagementDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _context = context;
+            _httpContext = httpContextAccessor;
         }
-
-        public async Task<IQueryable> GetUsers()
+     
+        public async Task<IQueryable> getUsers()
         {
 
             return from user in _context.Users
@@ -108,21 +111,24 @@ namespace SystemManagement.Service
             if (user != null)
             {
                 var password = await _userManager.CheckPasswordAsync(user, loginViewModel.Password);
+
                 if (password != true)
                 {
                     return Message = "NotMatch";
                 }
+
                 var userRole = await _userManager.GetRolesAsync(user);
+
+
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name,user.UserName),
+                    new Claim(ClaimTypes.Name,user.UserName,user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                 };
                 foreach (var userRoles in userRole)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRoles));
                 }
-
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
                 var token = new JwtSecurityToken(
                     issuer: _configuration["JWT:ValidIssuer"],
@@ -130,13 +136,37 @@ namespace SystemManagement.Service
                     expires: DateTime.Now.AddHours(3),
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-
-                var tokenHandler = new JwtSecurityTokenHandler().WriteToken(token);           
+                var tokenHandler = new JwtSecurityTokenHandler().WriteToken(token);
 
                 return tokenHandler;
-
             }
             return Message = "Unauthorized";
+
+
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var tokenDescription = new SecurityTokenDescriptor
+            //{
+            //    Subject = new ClaimsIdentity(new Claim[]
+            //    {
+            //          new Claim(ClaimTypes.Name,user.UserName,user.Id.ToString()),
+            //          new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+            //    }),
+            //    Issuer = _configuration["JWT:ValidIssuer"],
+            //    Audience = _configuration["JWT:ValidAudience"],
+            //    Expires = DateTime.Now.AddHours(3),
+            //    SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            //};            
+            //var token = tokenHandler.CreateToken(tokenDescription);
+            //var tokenSting = new JwtSecurityTokenHandler().WriteToken(token);
+
+
+            //List<string> lst = new List<string>(5);
+
+            //lst.Add(user.Id);
+            //lst.Add(tokenSting);
+
+            //return lst;
         }
+       
     }
 }
