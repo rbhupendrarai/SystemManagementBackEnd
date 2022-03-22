@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CarManagementSystem.Data.ViewModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -47,6 +49,13 @@ namespace SystemManagement.Service
                        Role = role.Name
 
                    };
+        }
+        public async Task<IQueryable> GetUser(LoginViewModel loginViewModel)
+        {
+            var user = _context.Users.Where(x => x.UserName == loginViewModel.UserName);
+            return user;
+
+
         }
 
         public async Task<string> Register(RegisterViewModel registerViewModel)
@@ -102,6 +111,7 @@ namespace SystemManagement.Service
 
         public async Task<string> Login(LoginViewModel loginViewModel)
         {
+
             var Message = string.Empty;
             var user = await _userManager.FindByNameAsync(loginViewModel.UserName);
 
@@ -112,6 +122,7 @@ namespace SystemManagement.Service
                 {
                     return Message = "NotMatch";
                 }
+                var userId = user.Id;
                 var userRole = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
                 {
@@ -131,12 +142,41 @@ namespace SystemManagement.Service
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
 
-                var tokenHandler = new JwtSecurityTokenHandler().WriteToken(token);           
+                var tokenHandler = new JwtSecurityTokenHandler().WriteToken(token);
 
                 return tokenHandler;
 
             }
             return Message = "Unauthorized";
+        }
+        public async Task<bool> EditProfile(string id,EditDetailViewModel model)
+        {
+            try
+            {
+                var result = await _context.Users.SingleOrDefaultAsync(x => x.Id == id);
+
+                if (result != null)
+                {
+                    result.UserName = model.UserName;
+                    result.Email = model.Email;
+               
+                    await _context.SaveChangesAsync();
+
+                }
+
+                if (model.Password != null)
+                {
+                    await _userManager.ChangePasswordAsync(result, model.Password, model.NewPassword);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+                return false;
+            }     
+
+
         }
     }
 }

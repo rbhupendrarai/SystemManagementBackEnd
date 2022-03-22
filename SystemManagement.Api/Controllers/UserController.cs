@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using CarManagementSystem.Data.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +41,7 @@ namespace SystemManagement.Api.Controllers
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             var result = await _userService.Login(loginViewModel);
+            var userDetail = await _userService.GetUser(loginViewModel);
 
             var Message = string.Empty;        
 
@@ -50,7 +53,7 @@ namespace SystemManagement.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "UserName Or Password Not Match!" });
             }
-            return Ok(new { token =result});
+            return Ok(new { token =result,user=userDetail});
         }
         [HttpPost]
         [Route("Register")]
@@ -74,6 +77,29 @@ namespace SystemManagement.Api.Controllers
             }
             return Ok(new Response { Status = "Success", Message = "created successfully!" });
         }
-       
+
+        [HttpPut]
+        [Route("EditProfile/{id}")]    
+        public async Task<IActionResult> EditProfile(string id,EditDetailViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.EditProfile(id,model);
+
+                if (result == true)
+                {
+                     return StatusCode(StatusCodes.Status200OK, new Response { Status = "Success", Message = "Profile Changed" });
+
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "profile Updation failed! Please check user details and try again." });
+                }
+
+            }
+            return Ok();
+        }
+
+
     }
 }
