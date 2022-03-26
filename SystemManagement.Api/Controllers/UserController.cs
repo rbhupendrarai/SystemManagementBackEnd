@@ -30,9 +30,9 @@ namespace SystemManagement.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserDetail()
+        public async Task<IActionResult> GetUserDetail(LoginViewModel loginViewModel)
         {
-            var result = await _userService.GetUsers();
+            var result = await _userService.GetUsers(loginViewModel);
             return Ok(result);
 
         }
@@ -41,7 +41,7 @@ namespace SystemManagement.Api.Controllers
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
             var result = await _userService.Login(loginViewModel);
-            var userDetail = await _userService.GetUser(loginViewModel);
+            var userDetail = await _userService.GetUsers(loginViewModel);
 
             var Message = string.Empty;        
 
@@ -79,6 +79,7 @@ namespace SystemManagement.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("EditProfile/{id}")]    
         public async Task<IActionResult> EditProfile(string id,EditDetailViewModel model)
         {
@@ -86,10 +87,14 @@ namespace SystemManagement.Api.Controllers
             {
                 var result = await _userService.EditProfile(id,model);
 
-                if (result == true)
+                if (result == "success")
                 {
                      return StatusCode(StatusCodes.Status200OK, new Response { Status = "Success", Message = "Profile Changed" });
 
+                }
+                if (result == "password")
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Password Change Faild" });
                 }
                 else
                 {

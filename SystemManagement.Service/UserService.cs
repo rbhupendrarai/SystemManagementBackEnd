@@ -32,7 +32,7 @@ namespace SystemManagement.Service
             _context = context;
         }
 
-        public async Task<IQueryable> GetUsers()
+        public async Task<IQueryable> GetUsers(LoginViewModel loginViewModel)
         {
 
             return from user in _context.Users
@@ -40,23 +40,23 @@ namespace SystemManagement.Service
                    on user.Id equals userRole.UserId
                    join role in _context.Roles
                    on userRole.RoleId equals role.Id
+                   where user.UserName == loginViewModel.UserName
                    select new
                    {
                        Id = user.Id,
                        LockDate = user.LockoutEnd,
                        UserName = user.UserName,
                        Email = user.Email,
+                       Phone=user.PhoneNumber,
                        Role = role.Name
 
                    };
         }
-        public async Task<IQueryable> GetUser(LoginViewModel loginViewModel)
-        {
-            var user = _context.Users.Where(x => x.UserName == loginViewModel.UserName);
-            return user;
-
-
-        }
+        //public async Task<IQueryable> GetUser(LoginViewModel loginViewModel)
+        //{
+        //    var user = _context.Users.Where(x => x.UserName == loginViewModel.UserName);
+        //    return user;
+        //}
 
         public async Task<string> Register(RegisterViewModel registerViewModel)
         {
@@ -149,31 +149,56 @@ namespace SystemManagement.Service
             }
             return Message = "Unauthorized";
         }
-        public async Task<bool> EditProfile(string id,EditDetailViewModel model)
+        public async Task<string> EditProfile(string id,EditDetailViewModel model)
         {
+
             try
             {
-                var result = await _context.Users.SingleOrDefaultAsync(x => x.Id == id);
+                var result =  _userManager.Users.SingleOrDefault(x => x.Id == id);
 
                 if (result != null)
                 {
-                    result.UserName = model.UserName;
-                    result.Email = model.Email;
-               
+                    if (model.UserName != string.Empty)
+                    {
+                        result.UserName = model.UserName;
+                        result.NormalizedUserName = model.UserName;
+                        
+                    }
+                    if (model.Email != string.Empty)
+                    {
+                        result.Email = model.Email;
+                       result.NormalizedEmail = model.Email;
+                       
+                    }
+                    if (model.Phone != string.Empty)
+                    {
+                        result.PhoneNumber = model.Phone;
+
+                    }
+                    if (model.Password != string.Empty)
+                    {
+                        try
+                        {
+                            var passwordMessage = await _userManager.ChangePasswordAsync(result, model.Password, model.NewPassword);
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.Message.ToString());
+                            return "password";
+                        }
+                  
+                    }
                     await _context.SaveChangesAsync();
 
                 }
 
-                if (model.Password != null)
-                {
-                    await _userManager.ChangePasswordAsync(result, model.Password, model.NewPassword);
-                }
-                return true;
+              
+                return "success";
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message.ToString());
-                return false;
+                return "faild";
             }     
 
 
