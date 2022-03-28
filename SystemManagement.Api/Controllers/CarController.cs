@@ -28,8 +28,9 @@ namespace SystemManagement.Api.Controllers
             var result = _carService.GetCarByID();
             return new JsonResult(result);
         }
-        [HttpGet]
+        [HttpPost]
         [Authorize(Roles ="Admin")]
+        [Route("AddCar")]
         public async Task<IActionResult> AddCar(Car car)
         {
             var result= await _carService.AddCar(car);
