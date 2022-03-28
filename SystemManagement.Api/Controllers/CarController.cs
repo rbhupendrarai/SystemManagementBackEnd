@@ -28,7 +28,7 @@ namespace SystemManagement.Api.Controllers
             var result = _carService.GetCarByID();
             return new JsonResult(result);
         }
-        [HttpPost]
+        [HttpGet]
         [Authorize(Roles ="Admin")]
         public async Task<IActionResult> AddCar(Car car)
         {
