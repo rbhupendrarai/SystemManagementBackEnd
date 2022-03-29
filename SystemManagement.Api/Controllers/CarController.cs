@@ -22,7 +22,7 @@ namespace SystemManagement.Api.Controllers
         }
 
         [HttpGet]  
-        [Authorize(Roles = "Admin")]
+       
         public JsonResult GetCar()
         {
             var result = _carService.GetCarByID();
