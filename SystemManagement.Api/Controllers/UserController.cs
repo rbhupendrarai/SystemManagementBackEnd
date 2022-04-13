@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -67,7 +69,7 @@ namespace SystemManagement.Api.Controllers
             if (result == "EmailExist")
             {
                 
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Email already exists!" });
+                return StatusCode(StatusCodes.Status208AlreadyReported, new Response { Status = "Error", Message = "Email already exists!" });
             }
         
             if (result == "Error")

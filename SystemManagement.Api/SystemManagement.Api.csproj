@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SystemManagement.Data\SystemManagement.Data.csproj" />
     <ProjectReference Include="..\SystemManagement.Service\SystemManagement.Service.csproj" />
   </ItemGroup>
 
