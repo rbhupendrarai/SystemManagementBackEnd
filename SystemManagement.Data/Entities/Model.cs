@@ -22,29 +22,29 @@ namespace SystemManagement.Data.Entities
         [Display(Name = "Discription")]
         public string MO_Discription { get; set; }
 
-        [Required]
+        
         [Column(TypeName = "varchar(max)")]
 
         [Display(Name = "Feature")]
         public string MO_Feature { get; set; }
-        [Required]
+     
         [Column(TypeName = "DateTime")]
         [Display(Name = "Created Date")]
         public DateTime? CreatedDate { get; set; }
 
-        [Required]
+      
         [Column(TypeName = "varchar")]
         [StringLength(30)]
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
 
-        [Required]
+       
         [Column(TypeName = "DateTime")]
         [StringLength(30)]
         [Display(Name = "Modified Date")]
         public DateTime? ModifiedDate { get; set; }
 
-        [Required]
+       
         [Column(TypeName = "varchar")]
         [StringLength(30)]
         [Display(Name = "Modified By")]

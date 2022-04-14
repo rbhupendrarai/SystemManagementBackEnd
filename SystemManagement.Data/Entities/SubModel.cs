@@ -33,25 +33,22 @@ namespace SystemManagement.Data.Entities
         [Column(TypeName = "decimal(18, 2)")]
         [Display(Name = "Price")]
         public decimal SM_Price { get; set; }
-
-
-        [Required]
+     
         [Column(TypeName = "DateTime")]
         [Display(Name = "Create Date")]
         public DateTime CreatedDate { get; set; }
-
-        [Required]
+       
         [Column(TypeName = "varchar")]
         [StringLength(30)]
         [Display(Name = "Created By")]
         public string CreatedBy { get; set; }
 
-        [Required]
+   
         [Column(TypeName = "DateTime")]
         [Display(Name = "Modified Date")]
         public DateTime ModifiedDate { get; set; }
 
-        [Required]
+        
         [Column(TypeName = "varchar")]
         [StringLength(30)]
         [Display(Name = "Modified By")]
