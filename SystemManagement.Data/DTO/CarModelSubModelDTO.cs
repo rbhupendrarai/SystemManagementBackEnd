@@ -15,6 +15,10 @@ namespace SystemManagement.Data.DTO
         public Guid CR_Id { get; set; }
         public string CR_Name { get; set; }
 
+        public Images image { get; set; }
+        public Guid Img_Id { get; set; }
+        public byte[] Img { get; set; }
+
         public Model model { get; set; }    
         public Guid MO_Id { get; set; }
         public string MO_Name { get; set; }

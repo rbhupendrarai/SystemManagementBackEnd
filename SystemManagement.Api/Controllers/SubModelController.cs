@@ -108,7 +108,7 @@ namespace SystemManagement.Api.Controllers
                 var query = _subModelService.GetSubModel();
                 if (!string.IsNullOrEmpty(search))
                 {
-                    query = query.Where(c => c.SM_Name.Contains(search) || c.SM_Discription.Contains(search) || c.SM_Feature.Contains(search) || c.SM_Price.Equals(search));
+                    query = query.Where(c => c.SM_Name.Contains(search) || c.SM_Discription.Contains(search) || c.SM_Feature.Contains(search));
                 }
                 return Ok(query);
             }

@@ -43,6 +43,7 @@ namespace SystemManagement.Api
             services.AddTransient<CarService>();
             services.AddTransient<ModelService>();
             services.AddTransient<SubModelService>();
+            services.AddTransient<ImageService>();
             services.AddDbContext<SystemManagementDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("connection")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<SystemManagementDbContext>()
                     .AddDefaultTokenProviders();  //Register Identity services
