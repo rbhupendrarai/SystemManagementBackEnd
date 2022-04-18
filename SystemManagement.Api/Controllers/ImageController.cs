@@ -19,11 +19,9 @@ namespace SystemManagement.Api.Controllers
     public class ImageController : Controller
     {
         private readonly ImageService _imageService;
-        private readonly SystemManagementDbContext _context;
-        public ImageController(ImageService imageService,SystemManagementDbContext context)
+        public ImageController(ImageService imageService)
         {
             _imageService = imageService;
-            _context = context;
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -44,29 +42,28 @@ namespace SystemManagement.Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin")]
         [Route("GetImage")]
-        public JsonResult GetImage()
+        public async Task<JsonResult> GetImage()
         {
             var result = _imageService.GetImage();
             return new JsonResult(result);
         }
-
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [Route("AddImage/{id}")]
-        public ActionResult AddImage(List<IFormFile> image,Guid id)
+        public async Task<ActionResult> AddImage(List<IFormFile> image,Guid id)
         {
             try
             {
                 if (image.ToList().Count != 0)
                 {
-                    var result = _imageService.AddImage(image, id);
+                    var result = await _imageService.AddImage(image, id);
                     return Ok();
                 }
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 }
-                return Ok();
+                
             }
             catch (Exception ex)
             {
@@ -77,13 +74,13 @@ namespace SystemManagement.Api.Controllers
         [HttpPut]
         [Authorize(Roles = "Admin")]
         [Route("EditImage/{id}")]
-        public async Task<IActionResult> EditImage(Guid id,Images img, IFormFile[] fileupload)
+        public async Task<IActionResult> EditImage(Guid id, List<IFormFile> image)
         {
             try
             {
-                if (fileupload != null && img.Img_Id != Guid.Empty)
+                if (image.ToList().Count != 0 &&  id != Guid.Empty)
                 {
-                    var result = await _imageService.EditImage(id, img, fileupload);
+                    var result = await _imageService.EditImage(id, image);
                     if (result == true)
                     {
                         return Ok();
@@ -103,29 +100,32 @@ namespace SystemManagement.Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        [Route("RetrieveImage")]
-        public IActionResult RetrieveImage()
+        [Route("GetImageFilters")]
+        public ActionResult GetImageFilters(string search)
         {
-            Images img = _context.Images.OrderByDescending(i => i.Img_Id).FirstOrDefault();
-            string imageBase64Data = Convert.ToBase64String(img.Img);
-            string imageDataURL = string.Format("data:image/jpg;base64,{0}", imageBase64Data);
-            ViewBag.ImageDataUrl = imageDataURL;
-            return View();
+            try
+            {
+                var query = _imageService.GetImage();
+                if (!string.IsNullOrEmpty(search))
+                {
+                    query = query.Where(c => c.MO_Name.Contains(search) );
+                } 
+                return Ok(query);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
         [Route("GetImageId/{id}")]
         public JsonResult GetImageId(Guid id)
         {
-            var result = _imageService.GetImageById(id);
+            var result =  _imageService.GetImageById(id);
             return new JsonResult(result);
         }
-      
-
-
         [HttpDelete]
         [Authorize(Roles = "Admin")]
         [Route("RemoveImage/{id}")]
@@ -133,8 +133,8 @@ namespace SystemManagement.Api.Controllers
         {
             try
             {
-                Images img = _imageService.GetImageById(id);
-                _imageService.DeleteImage(id);
+                 Images img =  _imageService.GetImageById(id);
+                  _imageService.DeleteImage(id);
                 return StatusCode(StatusCodes.Status200OK, new Response { Status = "Success", Message = "Image Deleted" });
             }
             catch (Exception ex)

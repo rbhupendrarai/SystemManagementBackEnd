@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SystemManagement.Data.Data;
+using SystemManagement.Data.DTO;
 using SystemManagement.Data.Entities;
 
 namespace SystemManagement.Service
@@ -35,6 +36,11 @@ namespace SystemManagement.Service
 
             });
         }
+        public IQueryable<CarModelSubModelDTO> GetAllModel()
+        {
+
+           
+        }
         public async Task<bool> AddCar(Car car)
         {
             try
@@ -58,7 +64,6 @@ namespace SystemManagement.Service
                 return false;
             }
         }
-
         public async Task<bool> EditCar(Guid id,Car cars)
         {
             try

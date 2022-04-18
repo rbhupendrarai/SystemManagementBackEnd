@@ -24,40 +24,71 @@ namespace SystemManagement.Service
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly SystemManagementDbContext _context;
-        public UserService(SystemManagementDbContext context,UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public UserService(SystemManagementDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _context = context;
         }
-
-        public async Task<IQueryable> GetUsers(LoginViewModel loginViewModel)
+        public IQueryable<UserViewModel> GetUsers()
         {
-
             return from user in _context.Users
                    join userRole in _context.UserRoles
                    on user.Id equals userRole.UserId
                    join role in _context.Roles
                    on userRole.RoleId equals role.Id
-                   where user.UserName == loginViewModel.UserName
+                   select new UserViewModel()
+                   {
+                       Id = user.Id,
+                       UserName = user.UserName,
+                       Email = user.Email,
+                       Phone = user.PhoneNumber,
+                       Role = role.Name,
+                       LockoutEnabled = user.LockoutEnabled
+
+                   };
+        }
+        public IQueryable LoginUserDetail(LoginViewModel loginViewModel)
+        {
+            return from user in _context.Users
+                   join userRole in _context.UserRoles
+                   on user.Id equals userRole.UserId
+                   join role in _context.Roles
+                   on userRole.RoleId equals role.Id
+                   where user.UserName == loginViewModel.UserName && user.LockoutEnabled == true
                    select new
                    {
                        Id = user.Id,
                        LockDate = user.LockoutEnd,
                        UserName = user.UserName,
                        Email = user.Email,
-                       Phone=user.PhoneNumber,
+                       Phone = user.PhoneNumber,
                        Role = role.Name
-
                    };
         }
-        //public async Task<IQueryable> GetUser(LoginViewModel loginViewModel)
-        //{
-        //    var user = _context.Users.Where(x => x.UserName == loginViewModel.UserName);
-        //    return user;
-        //}
-
+        public async Task<bool> GetUserByID(string id)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(x => x.Id == id);
+            var GetActiveStatus = _context.Users.Where(lockEnable => lockEnable.LockoutEnabled == false && lockEnable.Id == id);//Alerdy Deactive try to Active
+            var cntActiveStatus = GetActiveStatus.Count();
+            var GetDeactiveStatus = _context.Users.Where(lockEnable => lockEnable.LockoutEnabled == true && lockEnable.Id == id);//Alerdy Active try to DeActive
+            var cntDeactiveStatus = GetDeactiveStatus.Count();
+            if (user.ToString().Count() > 0)
+            {
+                if (cntActiveStatus > 0)
+                {
+                    user.LockoutEnabled = true;
+                    await _context.SaveChangesAsync();
+                }
+                if (cntDeactiveStatus > 0)
+                {
+                    user.LockoutEnabled = false;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            return true;
+        }
         public async Task<string> Register(RegisterViewModel registerViewModel)
         {
             string Message = string.Empty;
@@ -67,15 +98,11 @@ namespace SystemManagement.Service
                 Email = registerViewModel.Email,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
-
             var userNameExist = await _userManager.FindByNameAsync(user.UserName);
-
-
             if (userNameExist != null)
             {
                 return Message = "UserNameExist";
             }
-
             var userEmailExist = await _userManager.FindByEmailAsync(user.Email);
             if (userEmailExist != null)
             {
@@ -94,7 +121,6 @@ namespace SystemManagement.Service
             {
                 await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
             }
-
             if (await _roleManager.RoleExistsAsync(UserRoles.Admin))
             {
                 await _userManager.AddToRoleAsync(user, UserRoles.User);
@@ -103,18 +129,12 @@ namespace SystemManagement.Service
             {
                 await _userManager.AddToRoleAsync(user, UserRoles.Admin);
             }
-
             return Message = "Success";
         }
-
-
-
         public async Task<string> Login(LoginViewModel loginViewModel)
         {
-
             var Message = string.Empty;
-            var user = await _userManager.FindByNameAsync(loginViewModel.UserName);
-
+            var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == loginViewModel.UserName && x.LockoutEnabled == true);
             if (user != null)
             {
                 var password = await _userManager.CheckPasswordAsync(user, loginViewModel.Password);
@@ -143,18 +163,15 @@ namespace SystemManagement.Service
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
 
                 var tokenHandler = new JwtSecurityTokenHandler().WriteToken(token);
-
                 return tokenHandler;
-
             }
             return Message = "Unauthorized";
         }
-        public async Task<string> EditProfile(string id,EditDetailViewModel model)
+        public async Task<string> EditProfile(string id, EditDetailViewModel model)
         {
-
             try
             {
-                var result =  _userManager.Users.SingleOrDefault(x => x.Id == id);
+                var result = _userManager.Users.SingleOrDefault(x => x.Id == id);
 
                 if (result != null)
                 {
@@ -162,13 +179,13 @@ namespace SystemManagement.Service
                     {
                         result.UserName = model.UserName;
                         result.NormalizedUserName = model.UserName;
-                        
+
                     }
                     if (model.Email != string.Empty)
                     {
                         result.Email = model.Email;
-                       result.NormalizedEmail = model.Email;
-                       
+                        result.NormalizedEmail = model.Email;
+
                     }
                     if (model.Phone != string.Empty)
                     {
@@ -181,27 +198,29 @@ namespace SystemManagement.Service
                         {
                             var passwordMessage = await _userManager.ChangePasswordAsync(result, model.Password, model.NewPassword);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message.ToString());
                             return "password";
                         }
-                  
+
                     }
                     await _context.SaveChangesAsync();
 
                 }
-
-              
                 return "success";
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message.ToString());
                 return "faild";
-            }     
-
-
+            }
+        }
+        public void DeleteUser(string id)
+        {
+             IdentityUser user = _context.Users.Find(id);
+            _context.Users.Remove(user);
+            _context.SaveChanges();
         }
     }
 }

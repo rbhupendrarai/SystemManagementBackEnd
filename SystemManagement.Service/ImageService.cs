@@ -45,9 +45,9 @@ namespace SystemManagement.Service
         }
         public IQueryable<CarModelSubModelDTO> GetImage()
         {
-            return from m in _context.Images // outer sequence
-                   join c in _context.Models //inner sequence 
-                   on m.MO_Id equals c.MO_Id // key selector 
+            return from m in _context.Images 
+                   join c in _context.Models 
+                   on m.MO_Id equals c.MO_Id 
                    select new CarModelSubModelDTO()
                    { // result selector 
                        Img_Id=m.Img_Id,
@@ -74,8 +74,8 @@ namespace SystemManagement.Service
                 img.CreatedBy = "Admin";
                 img.ModifiedDate = DateTime.Now;
                 img.ModifiedBy = "Admin";
-                _context.Images.Add(img);
-                _context.SaveChanges();
+                await _context.Images.AddAsync(img);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -84,14 +84,15 @@ namespace SystemManagement.Service
             }
 
         }
-        public async Task<bool> EditImage(Guid id,Images img, IFormFile[] fileupload)
+        public async Task<bool> EditImage(Guid id, List<IFormFile> fileupload)
         {
             try
             {
+                Images img = new Images();
                 var result = await _context.Images.SingleOrDefaultAsync(x => x.Img_Id == id);
                 if (result != null)
                 {
-                    foreach (IFormFile file in fileupload)
+                    foreach (var file in fileupload)
                     {
                         MemoryStream ms = new MemoryStream();
                         file.CopyTo(ms);
@@ -124,10 +125,8 @@ namespace SystemManagement.Service
         public void DeleteImage(Guid id)
         {
             Images img = _context.Images.Find(id);
-            _context.Images.Remove(img);
-            _context.SaveChanges();
+             _context.Images.Remove(img);
+             _context.SaveChanges();
         }
-
     }
-
 }

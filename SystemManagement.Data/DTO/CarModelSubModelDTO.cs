@@ -10,7 +10,7 @@ namespace SystemManagement.Data.DTO
 {
     public class CarModelSubModelDTO
     {
-      
+    
         public Car car { get; set; }
         public Guid CR_Id { get; set; }
         public string CR_Name { get; set; }
