@@ -49,6 +49,7 @@ namespace SystemManagement.Data.Entities
         [StringLength(30)]
         [Display(Name = "Modified By")]
         public string ModifiedBy { get; set; }
+        public bool IsDeleted { get; set; }
         public Guid CR_Id { get; set; }
         [ForeignKey("CR_Id")]   
         public virtual Car Cars { get; set; }

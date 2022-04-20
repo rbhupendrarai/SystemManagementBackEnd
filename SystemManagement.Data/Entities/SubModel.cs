@@ -53,6 +53,7 @@ namespace SystemManagement.Data.Entities
         [StringLength(30)]
         [Display(Name = "Modified By")]
         public string ModifiedBy { get; set; }
+        public bool IsDeleted { get; set; }
 
         public Guid MO_Id { get; set; }
         [ForeignKey("MO_Id")]

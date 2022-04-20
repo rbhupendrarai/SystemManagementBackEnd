@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SystemManagement.Data.Entities;
@@ -26,6 +25,14 @@ namespace SystemManagement.Api.Controllers
         public JsonResult GetCar()
         {
             var result = _carService.GetCar();
+            return new JsonResult(result);
+        }
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [Route("GetAllModel")]
+        public JsonResult GetAllModel()
+        {
+            var result = _carService.GetAllModel();
             return new JsonResult(result);
         }
         [HttpPost]
@@ -136,5 +143,7 @@ namespace SystemManagement.Api.Controllers
             }
          
         }
+
+      
     }
 }

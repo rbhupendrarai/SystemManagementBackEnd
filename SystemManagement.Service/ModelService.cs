@@ -83,14 +83,12 @@ namespace SystemManagement.Service
                     result.ModifiedBy = "Admin";
                     result.ModifiedDate = DateTime.Now;
                     await _context.SaveChangesAsync();
-
                 }
                 else
                 {
                     return false;
                 }
                 return true;
-
             }
             catch (Exception ex)
             {

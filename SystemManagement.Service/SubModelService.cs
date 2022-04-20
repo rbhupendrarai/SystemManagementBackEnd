@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 using SystemManagement.Data.Data;
 using SystemManagement.Data.DTO;
 using SystemManagement.Data.Entities;
+using SystemManagement.Data.Procedure;
 
 namespace SystemManagement.Service
 {
     public class SubModelService
     {
         private readonly SystemManagementDbContext _context;
+        SubModelFiltersInput SubModelFiltersInput = new SubModelFiltersInput();
         public SubModelService(SystemManagementDbContext context)
         {
             _context = context;
@@ -26,7 +28,6 @@ namespace SystemManagement.Service
                CR_Name = car.CR_Name
 
            }).ToList();
-
         }
         public  IQueryable<CarModelSubModelDTO> GetModelList(Guid id)
         {
@@ -116,6 +117,14 @@ namespace SystemManagement.Service
             SubModel subModel = _context.SubModels.Find(id);
             _context.SubModels.Remove(subModel);
             _context.SaveChanges();
+        }
+
+        public async Task<List<SubModelFiltersInput>> GetFilters(string sort, int page_size, int page_limit)
+        {
+          
+            var result=  _context.FiltersInputs.FromSqlRaw("EXEC spSubModelFilter {0},{1},{2}", sort, page_size, page_limit).ToList();
+                
+            return result;
         }
 
     }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SystemManagement.Data.Data;
 
 namespace SystemManagement.Data.Migrations
 {
     [DbContext(typeof(SystemManagementDbContext))]
-    partial class SystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220420092300_spFiltersSubModel")]
+    partial class spFiltersSubModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -382,38 +384,6 @@ namespace SystemManagement.Data.Migrations
                     b.HasIndex("MO_Id");
 
                     b.ToTable("SubModel");
-                });
-
-            modelBuilder.Entity("SystemManagement.Data.Procedure.SubModelFiltersInput", b =>
-                {
-                    b.Property<Guid>("CR_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CR_Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("MO_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("MO_Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SM_Discription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SM_Feature")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SM_Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SM_Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("SM_Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.ToTable("FiltersInputs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

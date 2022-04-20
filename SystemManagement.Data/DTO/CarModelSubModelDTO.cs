@@ -14,7 +14,7 @@ namespace SystemManagement.Data.DTO
         public Car car { get; set; }
         public Guid CR_Id { get; set; }
         public string CR_Name { get; set; }
-
+        public string CR_Discription{ get; set; }
         public Images image { get; set; }
         public Guid Img_Id { get; set; }
         public byte[] Img { get; set; }

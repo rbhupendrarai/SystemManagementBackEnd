@@ -50,9 +50,9 @@ namespace SystemManagement.Api.Controllers
         [Authorize(Roles = "Admin")]
         [Route("AddSubModel")]
         public async Task<IActionResult> AddSubModel(SubModel subModel)
-        {           
+        {
             try
-            {             
+            {
                 var result = await _subModelService.AddSubmodel(subModel);
                 if (result == true)
                 {
@@ -61,7 +61,7 @@ namespace SystemManagement.Api.Controllers
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError);
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -71,11 +71,11 @@ namespace SystemManagement.Api.Controllers
         [HttpPut]
         [Authorize(Roles = "Admin")]
         [Route("EditSubModel/{id}")]
-        public async Task<IActionResult> EditSubModel(Guid id,SubModel subModel)
+        public async Task<IActionResult> EditSubModel(Guid id, SubModel subModel)
         {
             try
-            { 
-                var result = await _subModelService.EditSubModel(id,subModel);
+            {
+                var result = await _subModelService.EditSubModel(id, subModel);
                 if (result == true)
                 {
                     return StatusCode(StatusCodes.Status200OK, new Response { Status = "Success", Message = "Sub Model Updated Successfully" });
@@ -123,7 +123,7 @@ namespace SystemManagement.Api.Controllers
         public IActionResult RemoveSubModel(Guid id)
         {
             try
-            {             
+            {
                 _subModelService.DeleteModel(id);
                 return StatusCode(StatusCodes.Status200OK, new Response { Status = "Success", Message = "SM Model Deleted" });
             }
@@ -131,7 +131,27 @@ namespace SystemManagement.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
-          
+
+        }
+        [HttpGet]
+        [Route("GetProcedure")]
+        public async Task<IActionResult> GetProcedure(string sort, int page_size, int page_limit)
+        {
+            if(page_size == 0)
+            {
+                page_size = 1;
+            }
+            if (page_limit== 0)
+            {
+                page_limit= 10;
+            }
+            if (sort == null)
+            {
+                sort = "asc";
+            }
+            
+            var result =  _subModelService.GetFilters(sort, page_size, page_limit);
+            return Ok(result);
         }
     }
 }
