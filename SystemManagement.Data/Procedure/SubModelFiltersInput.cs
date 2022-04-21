@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace SystemManagement.Data.Procedure
 {
     [Keyless]
-
+  
     public class SubModelFiltersInput
     {            
         public Guid SM_Id { get; set; }    

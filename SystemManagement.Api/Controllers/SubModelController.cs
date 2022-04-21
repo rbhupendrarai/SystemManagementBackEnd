@@ -30,7 +30,7 @@ namespace SystemManagement.Api.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        [Route("GetModel/{id}")]
+        [Route("GetModel")]
         public JsonResult GetModel(Guid id)
         {
             var result = _subModelService.GetModelList(id);
@@ -134,23 +134,15 @@ namespace SystemManagement.Api.Controllers
 
         }
         [HttpGet]
+    
         [Route("GetProcedure")]
-        public async Task<IActionResult> GetProcedure(string sort, int page_size, int page_limit)
+        public async Task<IActionResult> GetProcedure(string sort, int page, int page_limit, string search,int a)
         {
-            if(page_size == 0)
-            {
-                page_size = 1;
-            }
-            if (page_limit== 0)
-            {
-                page_limit= 10;
-            }
-            if (sort == null)
-            {
-                sort = "asc";
-            }
-            
-            var result =  _subModelService.GetFilters(sort, page_size, page_limit);
+            page = page <= 0 ? 1 : page;
+            page_limit = page_limit <= 0 ? 5 : page_limit;
+            sort = !string.IsNullOrEmpty(sort) ? string.IsNullOrEmpty(sort.Trim()) ? "ASC" :sort : "ASC";
+
+            var result =  await _subModelService.GetFilters(sort, page, page_limit,search,a);
             return Ok(result);
         }
     }

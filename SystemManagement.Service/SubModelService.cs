@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace SystemManagement.Service
             return from car in _context.Cars
                    join model in _context.Models
                    on car.CR_Id equals model.CR_Id
-                   where car.CR_Id == id
+                   where car.CR_Id == id || car.CR_Id == Guid.Empty
                    select new CarModelSubModelDTO()
                    {
                        MO_Id=model.MO_Id,
@@ -119,11 +120,18 @@ namespace SystemManagement.Service
             _context.SaveChanges();
         }
 
-        public async Task<List<SubModelFiltersInput>> GetFilters(string sort, int page_size, int page_limit)
+        public async Task<List<SubModelFiltersInput>> GetFilters(string sort, int page, int page_limit, string search, int a)
         {
-          
-            var result=  _context.FiltersInputs.FromSqlRaw("EXEC spSubModelFilter {0},{1},{2}", sort, page_size, page_limit).ToList();
-                
+            var parameterReturn = new SqlParameter
+            {
+                ParameterName = "ReturnValue",
+                SqlDbType = System.Data.SqlDbType.Int,
+                Direction = System.Data.ParameterDirection.Output,
+            };
+            var result = await _context.FiltersInputs.FromSqlRaw("EXEC spSModelFilter {0},{1},{2},{3},{4}", sort, page, page_limit, search, a).ToListAsync();
+            var result1 = _context.FiltersInputs.FromSqlRaw("EXEC  @Total =spSModelFilter", parameterReturn);
+            int returnValue = (int)parameterReturn.Value;
+            Console.WriteLine("",+returnValue);
             return result;
         }
 
