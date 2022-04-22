@@ -120,19 +120,19 @@ namespace SystemManagement.Service
             _context.SaveChanges();
         }
 
-        public async Task<List<SubModelFiltersInput>> GetFilters(string sort, int page, int page_limit, string search, int a)
+        public async Task<SubView> GetFilters(string sort, int page, int page_limit, string search, int total)
         {
-            var parameterReturn = new SqlParameter
+           var  parameterReturn = new SqlParameter
             {
-                ParameterName = "ReturnValue",
+                ParameterName = "@Total",
                 SqlDbType = System.Data.SqlDbType.Int,
                 Direction = System.Data.ParameterDirection.Output,
             };
-            var result = await _context.FiltersInputs.FromSqlRaw("EXEC spSModelFilter {0},{1},{2},{3},{4}", sort, page, page_limit, search, a).ToListAsync();
-            var result1 = _context.FiltersInputs.FromSqlRaw("EXEC  @Total =spSModelFilter", parameterReturn);
-            int returnValue = (int)parameterReturn.Value;
-            Console.WriteLine("",+returnValue);
-            return result;
+            var result = await _context.FiltersInputs.FromSqlRaw("EXEC spSModelFilter {0},{1},{2},{3},{4} OUTPUT SELECT @Total", sort, page, page_limit, search, parameterReturn).ToListAsync();
+            int returnValue = Convert.ToInt32(parameterReturn.Value);
+      
+            return new SubView() { subModelFiltersViewModal = result, Total = returnValue };
+
         }
 
     }

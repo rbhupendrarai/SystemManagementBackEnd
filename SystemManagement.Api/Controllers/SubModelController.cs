@@ -38,7 +38,7 @@ namespace SystemManagement.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+
         [Route("GetSubModelDetail")]
         public JsonResult GetSubModelDetail()
         {
@@ -136,14 +136,15 @@ namespace SystemManagement.Api.Controllers
         [HttpGet]
     
         [Route("GetProcedure")]
-        public async Task<IActionResult> GetProcedure(string sort, int page, int page_limit, string search,int a)
+        public async Task<IActionResult> GetProcedure(string sort, int page, int page_limit, string search,int total)
         {
             page = page <= 0 ? 1 : page;
-            page_limit = page_limit <= 0 ? 5 : page_limit;
+            page_limit = page_limit <= 0 ? 3 : page_limit;
             sort = !string.IsNullOrEmpty(sort) ? string.IsNullOrEmpty(sort.Trim()) ? "ASC" :sort : "ASC";
-
-            var result =  await _subModelService.GetFilters(sort, page, page_limit,search,a);
-            return Ok(result);
+            total = total <= 0 ? 1 : total;
+            var result = await _subModelService.GetFilters(sort, page, page_limit, search, total);         
+            var jsonData = new {  data = result };
+            return Ok(jsonData);
         }
     }
 }

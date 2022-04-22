@@ -23,4 +23,11 @@ namespace SystemManagement.Data.Procedure
         public string MO_Name { get; set; }
 
     }
+
+    public class SubView
+    {
+        public List<SubModelFiltersInput> subModelFiltersViewModal { get; set; }
+        public int Total { get; set; }
+
+    }
 }
